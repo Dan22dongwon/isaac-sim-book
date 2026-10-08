@@ -1,0 +1,19 @@
+# Python
+__pycache__/
+*.py[cod]
+.ipynb_checkpoints/
+.venv/
+venv/
+
+# 실행 산출물
+out/
+logs/
+shots/
+*.pcd
+*.npy
+
+# 편집기 · OS
+.vscode/
+.idea/
+*.swp
+.DS_Store
