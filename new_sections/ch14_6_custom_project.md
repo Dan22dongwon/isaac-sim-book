@@ -197,7 +197,10 @@ def _get_dones(self) -> tuple[torch.Tensor, torch.Tensor]:
 def _get_dones(self):
     # 몸통이나 허벅지가 바닥에 닿았다 → 실패로 보고 리셋
     contact = self._contact_sensor.data.net_forces_w_history
-    died = torch.any(torch.max(torch.norm(contact[:, :, self._base_ids], dim=-1), dim=1)[0] > 1.0, dim=1)
+    died = torch.any(
+        torch.max(torch.norm(contact[:, :, self._base_ids], dim=-1), dim=1)[0] > 1.0,
+        dim=1,
+    )
     time_out = self.episode_length_buf >= self.max_episode_length - 1
     return died, time_out
 ```
