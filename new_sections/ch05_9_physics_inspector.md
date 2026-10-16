@@ -1,11 +1,11 @@
-# 5.X Physics Inspector로 관절 디버깅
+# 5.9 Physics Inspector로 관절 디버깅
 
 > **이 절의 목표**: Physics Inspector를 사용하여 로봇의 관절을 시각적으로 확인하고, 슬라이더로 직접 조작해 보는 것.
 > URDF나 USD로 임포트한 로봇이 "정말 관절이 제대로 설정되었는지" 확인하는 가장 빠른 방법이다.
 
 ---
 
-## 5.X.1 Physics Inspector란?
+## 5.9.1 Physics Inspector란?
 
 로봇을 임포트한 직후 가장 먼저 해야 할 일은 **관절이 제대로 돌아가는지 확인**하는 것이다. USD 파일을 열어 속성을 하나씩 읽는 것보다, Physics Inspector를 쓰면 슬라이더 하나로 관절을 직접 돌려 볼 수 있다.
 
@@ -20,10 +20,13 @@ Physics Inspector가 알려 주는 정보:
 
 ---
 
-## 5.X.2 Physics Inspector 열기
+## 5.9.2 Physics Inspector 열기
 
 1. 상단 메뉴에서 **Tools → Physics → Physics Inspector**를 선택한다.
 2. 새 패널이 열린다. 처음에는 비어 있다.
+
+![그림 5-9-1](../images/ch05_9/pi_01_franka_home.png)
+*[그림 5.9-1] 전 관절 0도 — Physics Inspector 슬라이더를 모두 가운데 둔 기준 자세*
 
 ### 로봇 선택 및 관절 탐색
 
@@ -45,9 +48,12 @@ Franka Panda의 경우 다음과 같은 관절이 보인다:
 | `panda_finger_joint1` | Prismatic | 0 ~ 0.04m | 왼쪽 집게 |
 | `panda_finger_joint2` | Prismatic | 0 ~ 0.04m | 오른쪽 집게 |
 
+📌 **실측 확인**: Isaac Sim 6.1의 `franka.usd`에서 위 표의 제한값은 모두 그대로 확인된다.
+관절 수는 **9개**(7축 팔 + 집게 2)다.
+
 ---
 
-## 5.X.3 슬라이더로 관절 조작하기
+## 5.9.3 슬라이더로 관절 조작하기
 
 Physics Inspector에서 각 관절 옆의 **슬라이더**를 드래그하면 관절이 즉시 움직인다.
 
@@ -55,7 +61,16 @@ Physics Inspector에서 각 관절 옆의 **슬라이더**를 드래그하면 �
 
 1. **회전 방향**: 슬라이더를 오른쪽으로 밀면 관절이 어느 방향으로 회전하는가? 예상과 다르면 URDF/USD의 축(axis) 설정을 확인한다.
 
+![그림 5-9-2](../images/ch05_9/pi_02_joint1_min.png)
+*[그림 5.9-2] `panda_joint1` 슬라이더를 하한(-166°)까지 민 자세*
+
+![그림 5-9-3](../images/ch05_9/pi_03_joint1_max.png)
+*[그림 5.9-3] `panda_joint1` 슬라이더를 상한(+166°)까지 민 자세 — 베이스를 축으로 팔 전체가 돌아간다*
+
 2. **제한(Limit)**: 슬라이더가 끝까지 갔을 때 로봇의 자세가 자연스러운가? 제한이 너무 넓으면 자기 몸과 충돌할 수 있다.
+
+![그림 5-9-4](../images/ch05_9/pi_04_joint4_bend.png)
+*[그림 5.9-4] `panda_joint2`·`panda_joint4`를 함께 움직여 팔꿈치를 접은 자세*
 
 3. **관절 개수**: Go2(4족)라면 12개(= 4다리 × 3관절), Franka라면 7+2(팔+집게)가 맞다. 숫자가 다르면 USD 파일이 잘못된 것이다.
 
@@ -71,9 +86,15 @@ Physics Inspector에서 각 관절 옆의 **슬라이더**를 드래그하면 �
 - [ ] Fixed Joint가 실제로 고정되어 있는가?
 - [ ] Prismatic Joint(집게 등)가 올바른 방향으로 열리는가?
 
+![그림 5-9-5](../images/ch05_9/pi_05_gripper_open.png)
+*[그림 5.9-5] 집게 열림 — `panda_finger_joint1/2`를 상한(0.04 m)으로*
+
+![그림 5-9-6](../images/ch05_9/pi_06_gripper_closed.png)
+*[그림 5.9-6] 집게 닫힘 — 하한(0.00 m)으로. 두 그림의 집게 간격을 비교해 보자*
+
 ---
 
-## 5.X.4 시뮬레이션 ON/OFF 차이
+## 5.9.4 시뮬레이션 ON/OFF 차이
 
 Physics Inspector의 동작은 **시뮬레이션 상태에 따라 달라진다**.
 
@@ -94,7 +115,7 @@ Physics Inspector의 동작은 **시뮬레이션 상태에 따라 달라진다**
 
 ---
 
-## 5.X.5 관절 속성 튜닝
+## 5.9.5 관절 속성 튜닝
 
 Physics Inspector에서 관절을 선택하면 Property 패널에 관절의 물리 속성이 나타난다. 핵심 속성 세 가지:
 
@@ -117,11 +138,24 @@ Physics Inspector에서 관절을 선택하면 Property 패널에 관절의 물�
 - Revolute: 각도(도) 단위.
 - Prismatic: 거리(m) 단위.
 
-💡 **팁**: Stiffness와 Damping의 초기값은 URDF에서 가져온 값이다. Isaac Sim에서 시뮬레이션이 불안정하면 이 값을 조정해야 한다. 일반적으로 `Damping ≈ Stiffness × 0.1` 정도가 안정적이다.
+💡 **팁**: Stiffness와 Damping의 초기값은 USD 에셋에 저장된 값이다. Isaac Sim에서 시뮬레이션이 불안정하면 이 값을 조정해야 한다.
+
+⚠️ **실측값 주의**: Isaac Sim 6.1의 `franka.usd`에 들어 있는 실제 게인은 흔히 인용되는 "강성 800 / 감쇠 40"과 **전혀 다르다**.
+
+| 관절 | Stiffness | Damping | 비고 |
+|---|---|---|---|
+| `panda_joint1` ~ `panda_joint7` | **22,918** | **4,584** | 7축 팔 전체 동일 |
+| `panda_finger_joint1` | **400** | **80** | 집게 구동 관절 |
+| `panda_finger_joint2` | **0** | **0** | mimic 관절 — joint1을 따라간다 |
+
+`panda_finger_joint2`의 게인이 0인 것은 고장이 아니다. 이 관절은 `finger_joint1`을 **따라 움직이는 종속(mimic) 관절**이라 독립적인 드라이브가 필요 없다.
+집게를 코드로 제어할 때는 두 관절에 **같은 값**을 주면 된다.
+
+📌 게인은 로봇·에셋마다 100배까지 차이 난다. **인용된 숫자를 믿지 말고 위 코드로 직접 출력해서 확인하자.**
 
 ---
 
-## 5.X.6 실습 — Franka 관절 점검
+## 5.9.6 실습 — Franka 관절 점검
 
 > 🛠️ **실습**: Franka Panda를 로드하고 Physics Inspector로 관절 7개를 하나씩 확인한다.
 
@@ -174,30 +208,43 @@ print(f"관절 이름: {franka.dof_names}")
 
 dof_props = franka.dof_properties
 for i, name in enumerate(franka.dof_names):
-    lower = np.degrees(dof_props["lower"][i])
-    upper = np.degrees(dof_props["upper"][i])
+    # ⚠️ Prismatic 관절(집게)은 미터 단위다. 전부 degrees()로 바꾸면 틀린 값이 나온다.
+    prismatic = "finger" in name
+    lo, hi = dof_props["lower"][i], dof_props["upper"][i]
+    if prismatic:
+        rng, unit = f"[{lo:7.3f}, {hi:7.3f}]", "m  "
+    else:
+        rng, unit = f"[{np.degrees(lo):7.1f}, {np.degrees(hi):7.1f}]", "deg"
     stiff = dof_props["stiffness"][i]
     damp = dof_props["damping"][i]
-    print(f"  {name:25s}  제한 [{lower:7.1f}°, {upper:7.1f}°]  "
-          f"강성 {stiff:.0f}  감쇠 {damp:.0f}")
+    print(f"  {name:25s}  제한 {rng} {unit}  "
+          f"강성 {stiff:8.0f}  감쇠 {damp:7.0f}")
 ```
 
-**예상 출력** (Franka Panda):
+**실제 출력** (Isaac Sim 6.1 / Franka Panda 실행 결과):
 
 ```
 관절 수: 9
-관절 이름: ['panda_joint1', 'panda_joint2', ..., 'panda_finger_joint2']
-  panda_joint1               제한 [ -166.0°,  166.0°]  강성 800  감쇠 40
-  panda_joint2               제한 [ -101.0°,  101.0°]  강성 800  감쇠 40
-  ...
-  panda_finger_joint1        제한 [    0.0°,    2.3°]  강성 800  감쇠 40
+관절 이름: ['panda_joint1', ..., 'panda_finger_joint1', 'panda_finger_joint2']
+  panda_joint1               제한 [ -166.0,  166.0] deg  강성    22918  감쇠    4584
+  panda_joint2               제한 [ -101.0,  101.0] deg  강성    22918  감쇠    4584
+  panda_joint3               제한 [ -166.0,  166.0] deg  강성    22918  감쇠    4584
+  panda_joint4               제한 [ -176.0,   -4.0] deg  강성    22918  감쇠    4584
+  panda_joint5               제한 [ -166.0,  166.0] deg  강성    22918  감쇠    4584
+  panda_joint6               제한 [   -1.0,  215.0] deg  강성    22918  감쇠    4584
+  panda_joint7               제한 [ -166.0,  166.0] deg  강성    22918  감쇠    4584
+  panda_finger_joint1        제한 [  0.000,   0.040] m    강성      400  감쇠      80
+  panda_finger_joint2        제한 [  0.000,   0.040] m    강성        0  감쇠       0
 ```
+
+⚠️ **흔한 실수**: 위 코드에서 `prismatic` 분기를 빼고 전 관절에 `np.degrees()`를 적용하면
+집게 제한이 `[0.0°, 2.3°]`로 출력된다. 이것은 **0.04 m를 각도로 잘못 환산한 값**이지 실제 제한이 아니다.
 
 GUI(Physics Inspector)와 코드 출력이 일치하면 관절 설정이 올바른 것이다.
 
 ---
 
-## 5.X.7 Go2에 Physics Inspector 적용하기 — 함정 사례
+## 5.9.7 Go2에 Physics Inspector 적용하기 — 함정 사례
 
 4족보행 로봇 Go2로 같은 확인을 해 보자. 여기에는 Ch5.5에서 다룬 **함정**이 있다.
 
@@ -215,16 +262,32 @@ Physics Inspector에서 **관절이 0개**로 나타나면 잘못된 USD 파일�
 
 ### Go2 관절 확인
 
-올바른 파일을 로드하면 **12개 관절**이 나타난다:
+올바른 파일을 로드하면 **12개 관절**이 나타난다. 다만 **순서에 함정이 있다**.
 
 ```
-FL_hip_joint, FL_thigh_joint, FL_calf_joint   (앞왼)
-FR_hip_joint, FR_thigh_joint, FR_calf_joint   (앞오른)
-RL_hip_joint, RL_thigh_joint, RL_calf_joint   (뒤왼)
-RR_hip_joint, RR_thigh_joint, RR_calf_joint   (뒤오른)
+# ❌ 다리별로 묶여 있다고 가정하면 틀린다
+#    FL_hip, FL_thigh, FL_calf, FR_hip, FR_thigh, FR_calf, ...
+
+# ✅ 실제 dof_names 순서 — '관절 종류별'로 묶여 있다
+FL_hip_joint,   FR_hip_joint,   RL_hip_joint,   RR_hip_joint      # 고관절 4개
+FL_thigh_joint, FR_thigh_joint, RL_thigh_joint, RR_thigh_joint    # 허벅지 4개
+FL_calf_joint,  FR_calf_joint,  RL_calf_joint,  RR_calf_joint     # 정강이 4개
+```
+
+⚠️ **인덱스로 관절을 지정할 때 특히 조심하자.** "앞왼쪽 다리는 0,1,2번"이라고 가정하면
+엉뚱한 관절이 움직인다. 반드시 `dof_names`를 출력해 **이름으로 인덱스를 찾아서** 쓰자.
+
+```python
+names = list(go2.dof_names)
+fl_leg = [names.index(n) for n in
+          ("FL_hip_joint", "FL_thigh_joint", "FL_calf_joint")]
+print(f"앞왼쪽 다리 인덱스: {fl_leg}")   # → [0, 4, 8]
 ```
 
 Physics Inspector 슬라이더로 hip → thigh → calf 순서로 각 관절을 움직여 보면, 다리 하나가 앞뒤로 접히고 옆으로 벌어지는 것을 확인할 수 있다.
+
+![그림 5-9-7](../images/ch05_9/pi_07_go2_joints.png)
+*[그림 5.9-7] Go2 12관절 — thigh 0.35 rad / calf −0.70 rad을 주어 네 다리를 굽힌 자세*
 
 ---
 
@@ -236,6 +299,9 @@ Physics Inspector 슬라이더로 hip → thigh → calf 순서로 각 관절을
 | 관절 확인 | 루트 prim 선택 → Refresh → 슬라이더 조작 |
 | 시뮬 OFF vs ON | OFF: 자유 조작 / ON: 물리 결과 관찰 |
 | 핵심 속성 | Stiffness(강성), Damping(감쇠), Limit(제한) |
-| Go2 함정 | `go2.usd`는 시각만, `go2_description_physics.usd`를 써야 함 |
+| Go2 함정 1 | `go2.usd`는 시각만, `go2_description_physics.usd`를 써야 함 |
+| Go2 함정 2 | 관절 순서가 다리별이 아니라 **종류별**(hip 4 → thigh 4 → calf 4) |
+| 게인 함정 | Franka 실측 강성은 22,918 — 인용된 800이 아니다 |
+| 단위 함정 | 집게는 Prismatic(m)이다. `degrees()`를 적용하면 안 된다 |
 
 다음 절에서는 이 관절들을 **Python 코드와 물리 컨트롤러**로 제어하는 방법을 다룬다.

@@ -1,11 +1,11 @@
-# 7.X OmniGraph 비주얼 프로그래밍
+# 7.9 OmniGraph 비주얼 프로그래밍
 
 > **이 절의 목표**: 코드를 작성하지 않고 OmniGraph의 노드 기반 에디터로 로봇을 제어하는 것.
 > 키보드 입력을 받아 로봇을 움직이는 Action Graph를 직접 만들어 보고, Python 스크립트 노드로 확장하는 방법까지 다룬다.
 
 ---
 
-## 7.X.1 OmniGraph란?
+## 7.9.1 OmniGraph란?
 
 OmniGraph는 Isaac Sim의 **노드 기반 비주얼 프로그래밍** 시스템이다. 코드를 작성하는 대신 **노드**(기능 블록)를 화면에 배치하고 **연결선**(와이어)으로 데이터 흐름을 정의한다.
 
@@ -30,7 +30,7 @@ Isaac Sim의 **ROS 2 브리지**(Ch8)는 내부적으로 OmniGraph로 구현되�
 
 ---
 
-## 7.X.2 첫 번째 Action Graph — 키보드로 로봇 제어
+## 7.9.2 첫 번째 Action Graph — 키보드로 로봇 제어
 
 이동 로봇(Differential Drive)을 키보드 W/A/S/D로 조종하는 OmniGraph를 만들어 보자.
 
@@ -39,6 +39,9 @@ Isaac Sim의 **ROS 2 브리지**(Ch8)는 내부적으로 OmniGraph로 구현되�
 1. Content Browser에서 Nova Carter를 씬에 드래그한다:
    `NVIDIA/Assets/Isaac/Robots/NVIDIA/NovaCarter/nova_carter.usd`
 2. **Create → Physics → Ground Plane**으로 바닥을 추가한다.
+
+![그림 7-9-1](../images/ch07_9/og_01_carter_placed.png)
+*[그림 7.9-1] Nova Carter를 바닥에 배치한 상태 — Play 전*
 
 ### Action Graph 생성 (GUI)
 
@@ -84,25 +87,50 @@ On Keyboard Input 노드를 4개 추가한다 (W, A, S, D 각각):
 
 Property 패널에서 Differential Controller의 속성을 설정한다:
 
-- **Wheel Radius**: 로봇 바퀴 반경 (Nova Carter: 약 0.08m)
-- **Wheel Distance**: 좌우 바퀴 간격 (Nova Carter: 약 0.41m)
+- **Wheel Radius**: 로봇 바퀴 반경 (Nova Carter: **약 0.133 m**)
+- **Wheel Distance**: 좌우 바퀴 간격 (Nova Carter: 약 0.41 m)
+
+⚠️ **바퀴 반경은 반드시 실측하자.** 자료마다 0.08 m로 적힌 경우가 있는데, Isaac Sim 6.1의
+`nova_carter.usd`에서 측정한 **유효 반경은 0.133 m**다. 반경을 절반으로 잘못 넣으면
+로봇이 명령 속도의 **약 1.7배로 달린다**.
+
+직접 확인하는 방법은 간단하다. 좌우 바퀴에 같은 각속도 ω를 주고 직진시킨 뒤,
+이동 거리에서 속도 v를 구하면 `반경 = v / ω` 다.
+
+```python
+# 바퀴 8.0 rad/s 로 3.00 초 직진 → 3.198 m 이동 → 1.066 m/s
+# 유효 반경 = 1.066 / 8.0 = 0.133 m
+```
 - **Max Linear Speed**: 최대 전진 속도 (예: 1.0 m/s)
 - **Max Angular Speed**: 최대 회전 속도 (예: 1.0 rad/s)
 
 **4단계 — Articulation Controller 설정**
 
-- **Robot Path**: `/World/nova_carter` (Stage에서 로봇 prim 경로)
-- **Joint Names**: 좌우 구동 바퀴의 관절 이름
+- **Robot Path**: `/World/Carter` (Stage에서 로봇 prim 경로)
+- **Joint Names**: 좌우 구동 바퀴의 관절 이름 — Nova Carter는 **`joint_wheel_left`, `joint_wheel_right`**
+
+📌 Nova Carter의 전체 관절은 7개다. 이 가운데 **구동 바퀴는 2개**이고,
+나머지(`joint_caster_*`, `joint_swing_*`)는 수동으로 끌려가는 캐스터다.
+
+```python
+print(carter.dof_names)
+# ['joint_caster_base', 'joint_wheel_left', 'joint_wheel_right',
+#  'joint_swing_left', 'joint_swing_right',
+#  'joint_caster_left', 'joint_caster_right']
+```
 
 **5단계 — 실행**
 
 ▶️(Play)를 누르고 W/A/S/D 키로 로봇을 조종해 보자.
 
+![그림 7-9-2](../images/ch07_9/og_02_carter_driven.png)
+*[그림 7.9-2] Differential Controller로 v = 0.6 m/s, ω = 0.35 rad/s를 준 주행 결과 — 3.5초에 2.41 m 이동*
+
 💡 **팁**: 키를 누르고 있는 동안만 로봇이 움직이고, 떼면 멈추게 하려면 On Keyboard Input의 **Pressed/Released** 이벤트를 분리하여 Released일 때 속도를 0으로 설정한다.
 
 ---
 
-## 7.X.3 자동 생성 기능 활용
+## 7.9.3 자동 생성 기능 활용
 
 Isaac Sim은 일부 로봇에 대해 OmniGraph 컨트롤러를 **자동 생성**해 주는 기능이 있다.
 
@@ -117,7 +145,7 @@ Isaac Sim은 일부 로봇에 대해 OmniGraph 컨트롤러를 **자동 생성**
 
 ---
 
-## 7.X.4 키 매핑 커스터마이징
+## 7.9.4 키 매핑 커스터마이징
 
 자동 생성된 OmniGraph에서 키보드 키를 바꾸고 싶다면:
 
@@ -133,7 +161,7 @@ Isaac Sim은 일부 로봇에 대해 OmniGraph 컨트롤러를 **자동 생성**
 
 ---
 
-## 7.X.5 Python 스크립트 노드
+## 7.9.5 Python 스크립트 노드
 
 OmniGraph의 기본 노드로 부족할 때, **Script Node**로 Python 코드를 직접 실행할 수 있다.
 
@@ -178,7 +206,7 @@ Script Node에 커스텀 입출력 포트를 추가할 수 있다:
 
 ---
 
-## 7.X.6 OmniGraph와 ROS 2의 관계
+## 7.9.6 OmniGraph와 ROS 2의 관계
 
 Ch8에서 다루는 ROS 2 연동은 내부적으로 OmniGraph를 사용한다. 주요 ROS 2 노드:
 
@@ -196,7 +224,7 @@ Ch8에서 다루는 ROS 2 연동은 내부적으로 OmniGraph를 사용한다. �
 
 ---
 
-## 7.X.7 실습 — Python으로 OmniGraph 프로그래밍
+## 7.9.7 실습 — Python으로 OmniGraph 프로그래밍
 
 GUI에서 만든 OmniGraph를 Python 코드로도 생성할 수 있다. 자동화와 재현성에 유용하다.
 
@@ -206,25 +234,29 @@ app = SimulationApp({"headless": False})
 
 import omni.graph.core as og
 
-# Action Graph 생성
+# Action Graph 생성 (Isaac Sim 6.1 기준 — 실행 검증 완료)
 keys = og.Controller.Keys
 (graph, nodes, _, _) = og.Controller.edit(
     {"graph_path": "/World/ActionGraph", "evaluator_name": "execution"},
     {
         keys.CREATE_NODES: [
             ("tick", "omni.graph.action.OnPlaybackTick"),
-            ("diff_ctrl", "omni.isaac.wheeled_robots.DifferentialController"),
-            ("art_ctrl", "omni.isaac.core_nodes.IsaacArticulationController"),
+            ("diff_ctrl", "isaacsim.robot.wheeled_robots.DifferentialController"),
+            ("art_ctrl", "isaacsim.core.nodes.IsaacArticulationController"),
         ],
         keys.SET_VALUES: [
             ("diff_ctrl.inputs:maxLinearSpeed", 1.0),
             ("diff_ctrl.inputs:wheelDistance", 0.41),
-            ("diff_ctrl.inputs:wheelRadius", 0.08),
-            ("art_ctrl.inputs:robotPath", "/World/nova_carter"),
+            ("diff_ctrl.inputs:wheelRadius", 0.133),     # 실측값
+            ("diff_ctrl.inputs:linearVelocity", 0.6),
+            ("diff_ctrl.inputs:angularVelocity", 0.35),
+            ("art_ctrl.inputs:robotPath", "/World/Carter"),
         ],
         keys.CONNECT: [
+            # tick 이 두 노드를 '모두' 구동한다.
             ("tick.outputs:tick", "diff_ctrl.inputs:execIn"),
-            ("diff_ctrl.outputs:execOut", "art_ctrl.inputs:execIn"),
+            ("tick.outputs:tick", "art_ctrl.inputs:execIn"),
+            # 속도 명령만 컨트롤러 사이로 흘려 보낸다
             ("diff_ctrl.outputs:velocityCommand", "art_ctrl.inputs:velocityCommand"),
         ],
     },
@@ -232,11 +264,45 @@ keys = og.Controller.Keys
 print(f"OmniGraph 생성 완료: 노드 {len(nodes)}개")
 ```
 
-⚠️ **주의**: OmniGraph 노드 이름은 Isaac Sim 버전에 따라 다를 수 있다. 6.1 기준 노드 이름을 사용한다. 노드를 찾을 수 없다는 에러가 나면 Action Graph 에디터의 검색 기능으로 정확한 이름을 확인하자.
+⚠️ **버전에 따라 바뀐 노드 이름**: `omni.isaac.*` 계열 이름은 6.1에서 `isaacsim.*`으로 바뀌었다.
+옛 이름을 쓰면 노드 생성 단계에서 실패한다.
+
+| 역할 | 옛 이름 (5.x 이하) | **6.1 이름** |
+|---|---|---|
+| 차동 구동 | `omni.isaac.wheeled_robots.DifferentialController` | `isaacsim.robot.wheeled_robots.DifferentialController` |
+| 관절 명령 | `omni.isaac.core_nodes.IsaacArticulationController` | `isaacsim.core.nodes.IsaacArticulationController` |
+| 재생 틱 | `omni.graph.action.OnPlaybackTick` | `omni.graph.action.OnPlaybackTick` (변동 없음) |
+
+⚠️ **`execOut`은 존재하지 않는다**: 많은 예제가 `diff_ctrl.outputs:execOut`을
+`art_ctrl.inputs:execIn`에 연결하지만, 6.1의 `DifferentialController`에는 **실행 출력 포트가 없다**.
+그대로 실행하면 다음 에러가 난다.
+
+```
+OmniGraphError: Failed to connect
+  /World/ActionGraph/diff_ctrl.outputs:execOut -> /World/ActionGraph/art_ctrl.inputs:execIn
+```
+
+6.1의 실제 포트 구성은 다음과 같다.
+
+| 노드 | 입력(inputs) | 출력(outputs) |
+|---|---|---|
+| `OnPlaybackTick` | — | `tick`, `time`, `frame`, `deltaSeconds` |
+| `DifferentialController` | `execIn`, `linearVelocity`, `angularVelocity`, `wheelRadius`, `wheelDistance`, `maxLinearSpeed`, `maxAngularSpeed`, `maxWheelSpeed`, `maxAcceleration`, `dt` … | **`velocityCommand` 뿐** |
+| `IsaacArticulationController` | `execIn`, `robotPath`, `targetPrim`, `jointNames`, `jointIndices`, `positionCommand`, `velocityCommand`, `effortCommand` | **없음** |
+
+즉 **실행 흐름은 `tick`이 두 노드에 각각 연결**하고, 두 컨트롤러 사이에는 **데이터(velocityCommand)만** 흐른다.
+
+💡 노드 이름이나 포트가 의심스러우면 다음처럼 직접 조회할 수 있다.
+
+```python
+node = og.Controller.node("/World/ActionGraph/diff_ctrl")
+for a in node.get_attributes():
+    print(a.get_port_type(), a.get_name())
+```
 
 ---
 
-## 7.X.8 실습 과제 — 키보드 제어 그래프
+## 7.9.8 실습 과제 — 키보드 제어 그래프
 
 > 🛠️ **실습**: Nova Carter를 W/A/S/D 키로 조종하는 Action Graph를 만들어 보자.
 
@@ -264,5 +330,8 @@ print(f"OmniGraph 생성 완료: 노드 {len(nodes)}개")
 | Script Node | OmniGraph 안에서 Python 코드 실행 |
 | ROS 2 연결 | Ch8의 ROS 2 브리지 = OmniGraph 노드 |
 | Python API | `og.Controller.edit()`로 코드에서 그래프 생성 |
+| 6.1 노드 이름 | `omni.isaac.*` → **`isaacsim.*`** 로 변경됨 |
+| 연결 함정 | `DifferentialController`에 `execOut`이 없다 — tick이 두 노드를 각각 구동 |
+| Carter 제원 | 바퀴 반경 **0.133 m**, 간격 0.41 m, 구동 관절 `joint_wheel_left/right` |
 
 Ch8(ROS 2 연동)에서는 이 OmniGraph 위에 ROS 2 Publisher/Subscriber 노드를 추가하여 외부 시스템과 통신하는 방법을 다룬다.

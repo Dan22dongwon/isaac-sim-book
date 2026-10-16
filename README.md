@@ -86,9 +86,9 @@ python ch03_setup/hello_isaac.py
 
 | 섹션 | 내용 | 원고 |
 |---|---|---|
-| Ch3.5 | GUI로 놀아보기 — 코드 없이 로봇 배치·시뮬레이션 | [`new_sections/ch03_5_gui_playground.md`](new_sections/ch03_5_gui_playground.md) |
-| Ch5.X | Physics Inspector로 관절 디버깅 | [`new_sections/ch05_x_physics_inspector.md`](new_sections/ch05_x_physics_inspector.md) |
-| Ch7.X | OmniGraph 비주얼 프로그래밍 | [`new_sections/ch07_x_omnigraph.md`](new_sections/ch07_x_omnigraph.md) |
+| Ch3.9 | GUI로 놀아보기 — 코드 없이 로봇 배치·시뮬레이션 (그림 10장) | [`new_sections/ch03_9_gui_playground.md`](new_sections/ch03_9_gui_playground.md) |
+| Ch5.9 | Physics Inspector로 관절 디버깅 (그림 7장) | [`new_sections/ch05_9_physics_inspector.md`](new_sections/ch05_9_physics_inspector.md) |
+| Ch7.9 | OmniGraph 비주얼 프로그래밍 (그림 2장) | [`new_sections/ch07_9_omnigraph.md`](new_sections/ch07_9_omnigraph.md) |
 
 ### 실행 결과 캡처
 
