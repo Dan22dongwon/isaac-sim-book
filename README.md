@@ -89,6 +89,10 @@ python ch03_setup/hello_isaac.py
 | Ch3.9 | GUI로 놀아보기 — 코드 없이 로봇 배치·시뮬레이션 (그림 10장) | [`new_sections/ch03_9_gui_playground.md`](new_sections/ch03_9_gui_playground.md) |
 | Ch5.9 | Physics Inspector로 관절 디버깅 (그림 7장) | [`new_sections/ch05_9_physics_inspector.md`](new_sections/ch05_9_physics_inspector.md) |
 | Ch7.9 | OmniGraph 비주얼 프로그래밍 (그림 2장) | [`new_sections/ch07_9_omnigraph.md`](new_sections/ch07_9_omnigraph.md) |
+| Ch3.10 | 호환성 체커 · Windows 설치 · 모션 파일로 자세 시험 | [`new_sections/ch03_10_setup_and_motions.md`](new_sections/ch03_10_setup_and_motions.md) |
+| Ch5.10 | Fusion 360에서 내 로봇 URDF 내보내기 | [`new_sections/ch05_10_fusion_urdf.md`](new_sections/ch05_10_fusion_urdf.md) |
+| Ch14.6 | 내 로봇으로 Isaac Lab 프로젝트 만들기 | [`new_sections/ch14_6_custom_project.md`](new_sections/ch14_6_custom_project.md) |
+| Ch22.6 | LiDAR 데이터로 주행 분류기 학습 (그림 5장) | [`new_sections/ch22_6_lidar_classifier.md`](new_sections/ch22_6_lidar_classifier.md) |
 
 ### 실행 결과 캡처
 
